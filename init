@@ -1,1 +1,17 @@
-sbin/init
+#!/bin/sh
+mkdir /proc
+mkdir /sys
+mkdir /d
+/bin/mount /proc
+/bin/mount /sys
+echo /sbin/mdev >/proc/sys/kernel/hotplug
+mdev -s
+mkdir /roothost
+mkdir /newroot
+# Wait for block devices to be detected
+sleep 5
+mount /dev/mmcblk0p12 /roothost
+mount -oloop /roothost/media/0/alarm-fs.img /newroot
+mkdir -p /newroot/mnt/userdata
+mount --move /roothost /newroot/mnt/userdata
+exec switch_root /newroot /sbin/init
