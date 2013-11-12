@@ -15,9 +15,8 @@ mdev -s
 # Create mount points
 mkdir -p $DATAMOUNT
 mkdir -p $NEWROOT
-# Wait for block devices to enumerate
-# TODO: find better way to do this!
-sleep 5
+echo -e "\nWaiting for data partition...\n"
+while [ ! -b $DATAPART ]; do sleep 1; done
 # Mount loopback image and remount data partition under it
 mount $DATAPART $DATAMOUNT
 mount -oloop $ROOTIMG $NEWROOT
