@@ -1,17 +1,26 @@
 #!/bin/sh
+DATAPART=/dev/mmcblk0p12
+DATAMOUNT=/data
+ROOTIMG=$DATAMOUNT/media/0/linux_root.img
+NEWROOT=/newroot
+DATAREMOUNT=$NEWROOT/mnt/android_data
+
+# Prepare basic system
 mkdir /proc
 mkdir /sys
-mkdir /d
-/bin/mount /proc
-/bin/mount /sys
+mount /proc
+mount /sys
 echo /sbin/mdev >/proc/sys/kernel/hotplug
 mdev -s
-mkdir /roothost
-mkdir /newroot
-# Wait for block devices to be detected
+# Create mount points
+mkdir -p $DATAMOUNT
+mkdir -p $NEWROOT
+# Wait for block devices to enumerate
+# TODO: find better way to do this!
 sleep 5
-mount /dev/mmcblk0p12 /roothost
-mount -oloop /roothost/media/0/alarm-fs.img /newroot
-mkdir -p /newroot/mnt/userdata
-mount --move /roothost /newroot/mnt/userdata
-exec switch_root /newroot /sbin/init
+# Mount loopback image and remount data partition under it
+mount $DATAPART $DATAMOUNT
+mount -oloop $ROOTIMG $NEWROOT
+mkdir -p $DATAREMOUNT
+mount --move $DATAMOUNT $DATAREMOUNT
+exec switch_root $NEWROOT /sbin/init
