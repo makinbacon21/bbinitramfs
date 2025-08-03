@@ -1,9 +1,4 @@
 #!/bin/sh
-DATAPART=/dev/mmcblk0p12
-DATAMOUNT=/data
-ROOTIMG=$DATAMOUNT/media/0/linux_root.img
-NEWROOT=/newroot
-DATAREMOUNT=$NEWROOT/mnt/android_data
 
 # Prepare basic system
 mkdir /proc
@@ -12,14 +7,4 @@ mount /proc
 mount /sys
 echo /sbin/mdev >/proc/sys/kernel/hotplug
 mdev -s
-# Create mount points
-mkdir -p $DATAMOUNT
-mkdir -p $NEWROOT
-echo -e "\nWaiting for data partition...\n"
-while [ ! -b $DATAPART ]; do sleep 1; done
-# Mount loopback image and remount data partition under it
-mount $DATAPART $DATAMOUNT
-mount -oloop $ROOTIMG $NEWROOT
-mkdir -p $DATAREMOUNT
-mount --move $DATAMOUNT $DATAREMOUNT
-exec switch_root $NEWROOT /sbin/init
+exec /bin/sh
