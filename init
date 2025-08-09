@@ -5,6 +5,8 @@ mkdir /proc
 mkdir /sys
 mount /proc
 mount /sys
-echo /sbin/mdev >/proc/sys/kernel/hotplug
-mdev -s
+
+# mount debugfs
+mount -t debugfs none /sys/kernel/debug
+
 exec /bin/sh
